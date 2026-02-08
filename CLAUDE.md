@@ -554,3 +554,63 @@ pnpm start        # Start production server locally
 - Check for build warnings
 - Verify bundle size is reasonable
 - Test production build locally before deploying
+
+## Project-Specific Notes
+
+### Rainfall Data Priority
+
+**Critical Requirement**: CoCoRaHS manual observations ALWAYS take priority over automated rain gauge data.
+
+- When displaying rainfall, check for CoCoRaHS data first
+- If CoCoRaHS data is unavailable for a given date, fall back to weather station data
+- Always indicate the data source in the UI (badge or icon showing "CoCoRaHS" vs "Station")
+- Consider showing both values when available for comparison
+
+### Data Source Reliability
+
+**Primary Sources:**
+
+- Temperature, humidity, wind, pressure: Ambient Weather (most current)
+- Rainfall: CoCoRaHS (most accurate)
+
+**Backup Sources:**
+
+- PWS Weather and Wunderground serve as fallbacks if primary sources fail
+- Display warnings when using backup/cached data
+
+### UI/UX Inspiration
+
+Draw design inspiration from:
+
+- Ambient Weather dashboard - Clean data presentation
+- PWS Weather - Specific features you prefer (document as you discover them)
+- Weather Underground - Specific features you prefer (document as you discover them)
+
+Document specific UI elements you want to replicate as you develop the application.
+
+### Future Enhancements
+
+Ideas to consider for future development:
+
+- Historical data visualization and trends
+- Weather alerts and notifications
+- Mobile-responsive design
+- Data export functionality
+- Comparison views (CoCoRaHS vs station rainfall)
+- Weather statistics (monthly/yearly summaries)
+
+### Project Status Updates
+
+As the project evolves, update the "Current Status" section in Project Overview to reflect:
+
+- Current development phase
+- Completed features
+- Known issues or limitations
+- Next priorities
+
+### Remember
+
+- This is a personal project - prioritize features that matter to you
+- Don't over-engineer - start simple and add complexity as needed
+- Document decisions and learnings in this file or project documentation
+- Update this CLAUDE.md as patterns emerge and requirements change
