@@ -255,3 +255,153 @@ Transform each API's response into this unified format for consistent component 
 - Loading states for data fetching
 - Error boundaries to prevent full app crashes
 - Toast notifications for background update failures
+
+## Data Source Integration
+
+### Ambient Weather API
+
+**Purpose**: Primary source for automated weather station data
+
+**Authentication:**
+
+- Requires API key and Application key
+- Store credentials in `.env.local` (never commit this file)
+- Reference in code as `process.env.AMBIENT_WEATHER_API_KEY` and `process.env.AMBIENT_WEATHER_APP_KEY`
+
+**API Documentation:**
+
+- Official docs: <https://ambientweather.docs.apiary.io/>
+- Rate limits: 1 request per second per API key
+- Data update frequency: Typically every 5 minutes
+
+**Available Data:**
+
+- Temperature (indoor/outdoor, feels like)
+- Humidity (indoor/outdoor)
+- Barometric pressure
+- Wind speed and direction
+- Rain gauge readings (use CoCoRaHS instead for rainfall)
+- UV index, solar radiation
+- Device battery status
+
+**Implementation Notes:**
+
+- Use server-side API routes to protect keys
+- Cache responses for 5 minutes
+- Handle rate limiting with exponential backoff
+- Consider WebSocket connections for real-time updates (if available)
+
+### PWS Weather API
+
+**Purpose**: Alternative/backup source for weather station data
+
+**Authentication:**
+
+- Station ID required
+- API key may be required depending on access method
+- Store credentials in `.env.local`
+
+**Implementation Notes:**
+
+- Check documentation at pwsweather.com for API endpoints
+- May require less frequent polling than Ambient Weather
+- Use as fallback when Ambient Weather API is unavailable
+
+### Weather Underground API
+
+**Purpose**: Alternative/backup source and historical data access
+
+**Authentication:**
+
+- Personal Weather Station ID (PWS ID)
+- API key may be required for API access
+- Store credentials in `.env.local`
+
+**Implementation Notes:**
+
+- Wunderground API access has changed over time; verify current API availability
+- May provide historical data access
+- Can serve as backup data source
+
+### CoCoRaHS Integration
+
+**Purpose**: Primary source for accurate rainfall measurements
+
+**Data Type**: Manual observations (not automated API)
+
+**Integration Approach:**
+
+Since CoCoRaHS doesn't provide a traditional API for personal station data:
+
+#### Option 1: Manual Entry
+
+- Create a simple form in the dashboard to enter daily rainfall observations
+- Store in local database or state
+- Timestamp entries for historical tracking
+
+#### Option 2: Data Export/Import
+
+- Export your CoCoRaHS observations (if available through their website)
+- Import into the application
+- Parse and store for display
+
+#### Option 3: Web Scraping (Use with Caution)
+
+- Only if no API is available and you have permission
+- Scrape your own observation data from CoCoRaHS website
+- Implement responsibly with appropriate delays
+
+**Data Storage:**
+
+```typescript
+interface CoCoRaHSObservation {
+  date: Date;
+  rainfall: number; // in inches or mm
+  snowfall?: number; // optional
+  notes?: string;
+  source: 'manual' | 'import';
+}
+```
+
+**Implementation Priority:**
+
+- Start with manual entry form
+- CoCoRaHS data overrides weather station rain gauge for all rainfall displays
+- Display indicator showing rainfall source (CoCoRaHS vs. station)
+
+### General API Best Practices
+
+**Environment Variables:**
+
+- **CRITICAL**: Never commit API keys to git
+- All credentials go in `.env.local` (already in .gitignore)
+- Create `.env.example` with variable names only (no values) to document required variables
+- Document all required environment variables in README or separate documentation
+
+**Error Handling:**
+
+- Implement try-catch blocks for all API calls
+- Log errors for debugging (use appropriate logging level)
+- Return graceful fallbacks when APIs fail
+- Display user-friendly error messages
+
+**Rate Limiting:**
+
+- Respect API rate limits
+- Implement request queuing if needed
+- Use exponential backoff for retries
+- Cache responses appropriately
+
+**Data Validation:**
+
+- Validate API responses before using
+- Check for expected data structure
+- Handle missing or null values
+- Use TypeScript interfaces for type safety
+
+**Security:**
+
+- All API calls should go through Next.js API routes (server-side)
+- Never expose API keys in client-side code
+- Sanitize any user input before using in API calls
+- Use HTTPS for all external API requests
