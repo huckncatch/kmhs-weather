@@ -115,3 +115,143 @@ kmhs-weather/
 ├── .env.example         # Template for required env vars
 └── package.json
 ```
+
+## Architecture Principles
+
+### Multi-Source Data Aggregation
+
+The application integrates data from four different sources, each with different formats and update frequencies:
+
+1. **Ambient Weather API** - Real-time automated weather station data
+2. **PWS Weather** - Shared/syndicated weather station data
+3. **Weather Underground** - Shared/syndicated weather station data
+4. **CoCoRaHS** - Manual rainfall observations (primary source for precipitation)
+
+### Data Flow Architecture
+
+```text
+┌─────────────────────┐
+│   Data Sources      │
+│  (External APIs)    │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  API Routes         │
+│  (Next.js /api)     │  ← Secure API key storage
+│  - Server-side only │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  Data Layer         │
+│  - Normalization    │
+│  - Transformation   │
+│  - Validation       │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  State Management   │
+│  (TanStack Query)   │  ← Caching & revalidation
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│  React Components   │
+│  (UI Display)       │
+└─────────────────────┘
+```
+
+### Component Structure
+
+**Atomic Design Pattern:**
+
+- **Atoms**: Basic UI elements (Temperature display, Wind icon, etc.)
+- **Molecules**: Combined elements (Weather card, Stat group, etc.)
+- **Organisms**: Complex sections (Current conditions panel, Forecast section, etc.)
+- **Templates**: Page layouts
+- **Pages**: Actual routes in the app
+
+### Data Fetching Strategy
+
+**Server-Side Rendering (SSR) for Initial Load:**
+
+- Fetch initial weather data on the server
+- Fast first paint with data already loaded
+- Better SEO if public-facing
+
+**Client-Side Updates:**
+
+- Use TanStack Query or SWR for automatic background updates
+- Configurable refresh intervals (e.g., every 5 minutes for weather data)
+- Automatic retries on failures
+
+### State Management
+
+**Recommended Approach:**
+
+- **TanStack Query (React Query)** for server state (API data)
+  - Automatic caching
+  - Background refetching
+  - Stale-while-revalidate pattern
+  - No need for Redux/Zustand for API data
+
+- **React Context** or **Zustand** for UI state (if needed)
+  - User preferences (units, display options)
+  - Dashboard customization settings
+
+### Caching Strategy
+
+**API Response Caching:**
+
+- Cache Ambient Weather data for 5 minutes (updates frequently)
+- Cache PWS/Wunderground data for 10 minutes (less frequent updates)
+- Cache CoCoRaHS data for 24 hours (manual daily observations)
+- Use stale-while-revalidate for seamless UX
+
+**Browser Caching:**
+
+- Static assets cached indefinitely
+- API responses with appropriate Cache-Control headers
+
+### Data Normalization
+
+**Problem**: Each API returns data in different formats
+
+**Solution**: Create a unified internal data model
+
+```typescript
+// Unified weather data interface
+interface WeatherData {
+  timestamp: Date;
+  temperature: {
+    current: number;
+    feelsLike: number;
+    unit: 'F' | 'C';
+  };
+  rainfall: {
+    today: number;
+    source: 'cocorahs' | 'station'; // Prioritize CoCoRaHS
+    unit: 'in' | 'mm';
+  };
+  // ... other normalized fields
+}
+```
+
+Transform each API's response into this unified format for consistent component rendering.
+
+### Error Handling
+
+**Graceful Degradation:**
+
+- If one API fails, display data from other sources
+- Show clear error messages for failed sources
+- Use cached data when APIs are unavailable
+- Implement retry logic with exponential backoff
+
+**User Feedback:**
+
+- Loading states for data fetching
+- Error boundaries to prevent full app crashes
+- Toast notifications for background update failures
