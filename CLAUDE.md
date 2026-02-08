@@ -405,3 +405,152 @@ interface CoCoRaHSObservation {
 - Never expose API keys in client-side code
 - Sanitize any user input before using in API calls
 - Use HTTPS for all external API requests
+
+## Development Workflow & Code Quality
+
+### Git Workflow
+
+**Branch Strategy:**
+
+- `main` - Stable, working code
+- Feature branches for new functionality (e.g., `feature/ambient-api`, `feature/rainfall-form`)
+- Bug fix branches (e.g., `fix/api-caching`)
+
+**Commit Practices:**
+
+- Follow global CLAUDE.md guidelines for commits
+- Present commit messages for approval before committing
+- Commit frequently with focused, atomic changes
+- Never commit API keys or sensitive data
+
+### TypeScript Configuration
+
+**tsconfig.json settings:**
+
+- Enable strict mode (`"strict": true`)
+- Enable all type checking options
+- Configure path aliases for cleaner imports (e.g., `@/components`, `@/lib`)
+- Target modern JavaScript (ES2020+)
+
+### Code Quality Tools
+
+**ESLint:**
+
+- Install and configure ESLint for TypeScript
+- Use Next.js recommended config as base
+- Add rules for React hooks
+- Run before every commit
+
+**Prettier:**
+
+- Install Prettier for consistent formatting
+- Configure to work with ESLint
+- Set up format-on-save in your editor
+- Add `.prettierrc` configuration file
+
+**Example npm scripts:**
+
+```json
+{
+  "scripts": {
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "type-check": "tsc --noEmit"
+  }
+}
+```
+
+### Testing Strategy
+
+**Unit Testing:**
+
+- Use Vitest or Jest for unit tests
+- Test data transformation functions
+- Test utility functions
+- Test CoCoRaHS observation logic
+
+**Integration Testing:**
+
+- Mock API responses for consistent testing
+- Test API route handlers
+- Test data normalization across sources
+- Use MSW (Mock Service Worker) for API mocking
+
+**Component Testing:**
+
+- Use React Testing Library
+- Test component rendering with different data states
+- Test loading states and error states
+- Test user interactions (forms, buttons)
+
+**Example test structure:**
+
+```typescript
+describe('Weather Data Normalization', () => {
+  it('should normalize Ambient Weather API response', () => {
+    const rawData = mockAmbientWeatherResponse;
+    const normalized = normalizeAmbientData(rawData);
+    expect(normalized.temperature.unit).toBe('F');
+  });
+
+  it('should prioritize CoCoRaHS rainfall over station data', () => {
+    const weatherData = mockWeatherData;
+    const cocorahsData = mockCoCoRaHSData;
+    const combined = combineWeatherData(weatherData, cocorahsData);
+    expect(combined.rainfall.source).toBe('cocorahs');
+  });
+});
+```
+
+### Development Environment Setup
+
+**Required Tools:**
+
+- Node.js (LTS version)
+- pnpm or npm
+- Git
+- Code editor (VS Code recommended with TypeScript/ESLint extensions)
+
+**Initial Setup:**
+
+1. Clone repository
+2. Copy `.env.example` to `.env.local` and fill in API credentials
+3. Run `pnpm install` (or `npm install`)
+4. Run `pnpm dev` to start development server
+5. Access at `http://localhost:3000`
+
+### Pre-commit Checklist
+
+Before committing code:
+
+- [ ] Run linter and fix all errors
+- [ ] Run type checker (no TypeScript errors)
+- [ ] Run tests (if test suite exists)
+- [ ] Format code with Prettier
+- [ ] Review changes with `git diff`
+- [ ] Verify no API keys or secrets in code
+- [ ] Write clear commit message
+
+### Build Process
+
+**Development Build:**
+
+```bash
+pnpm dev          # Start dev server with hot reload
+```
+
+**Production Build:**
+
+```bash
+pnpm build        # Create optimized production build
+pnpm start        # Start production server locally
+```
+
+**Build Verification:**
+
+- Ensure no TypeScript errors
+- Check for build warnings
+- Verify bundle size is reasonable
+- Test production build locally before deploying
