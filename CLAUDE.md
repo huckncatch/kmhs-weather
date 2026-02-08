@@ -41,3 +41,77 @@ This application integrates data from multiple sources:
 ### Current Status
 
 **In Development** - Project is in the initial setup and planning phase.
+
+## Technology Stack & Framework Selection
+
+### Recommended Stack
+
+**TypeScript** is the recommended language for this project for the following reasons:
+
+- **Type Safety**: Strong typing prevents bugs when working with multiple API data sources with different formats
+- **Better Developer Experience**: Autocomplete, IntelliSense, and refactoring support
+- **API Data Modeling**: Define interfaces for Ambient Weather, PWS Weather, Wunderground, and CoCoRaHS data structures
+- **Maintainability**: Self-documenting code with type definitions
+
+### Framework: Next.js
+
+**Next.js** is a React framework that runs on **Node.js**. Here's how the pieces fit together:
+
+- **Node.js**: JavaScript runtime that executes your code on the server
+- **Next.js**: Framework built on top of Node.js and React
+- **React**: UI library for building components
+
+**Why Next.js:**
+
+- Built-in API routes for secure server-side API key management (runs on Node.js)
+- Server-Side Rendering (SSR) for initial weather data load
+- File-based routing
+- Built-in optimization (images, fonts, code splitting)
+- Great development experience with Fast Refresh
+
+**Node.js Benefits:**
+
+- Server-side API routes keep your API keys secure (never exposed to browser)
+- Can fetch data from multiple sources server-side before rendering
+- Run scheduled tasks (e.g., periodic CoCoRaHS data updates)
+
+### Build & Development Tools
+
+- **Package Manager**: pnpm (faster, more efficient) or npm
+- **Styling**: Tailwind CSS (utility-first, rapid development) or CSS Modules
+- **Data Fetching**: TanStack Query (React Query) or SWR for caching and automatic revalidation
+- **Charts/Visualizations**: Recharts (React-based) or Chart.js
+- **Date/Time Handling**: date-fns (lightweight) or Luxon (more features)
+- **HTTP Client**: fetch API (built-in) or axios
+
+### Development Focus
+
+**Current Priority**: Local development and personal use
+
+- Run locally with `npm run dev` or `pnpm dev`
+- Access via `localhost:3000`
+- Deployment considerations can wait until closer to release-ready
+
+### Project Structure
+
+Recommended directory layout:
+
+```text
+kmhs-weather/
+├── src/
+│   ├── app/             # Next.js App Router (pages & layouts)
+│   ├── components/      # React components
+│   ├── lib/             # Utilities and helpers
+│   ├── types/           # TypeScript type definitions
+│   ├── api/             # API integration logic
+│   │   ├── ambient.ts      # Ambient Weather API
+│   │   ├── pwsweather.ts   # PWS Weather API
+│   │   ├── wunderground.ts # Weather Underground API
+│   │   └── cocorahs.ts     # CoCoRaHS integration
+│   ├── hooks/           # Custom React hooks
+│   └── styles/          # CSS/styling files
+├── public/              # Static assets
+├── .env.local           # Environment variables (not committed)
+├── .env.example         # Template for required env vars
+└── package.json
+```
