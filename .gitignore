@@ -45,3 +45,6 @@ Thumbs.db
 # Temporary Files
 *.tmp
 .cache/
+
+# Claude
+.claude/
