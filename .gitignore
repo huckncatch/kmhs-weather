@@ -48,3 +48,7 @@ Thumbs.db
 
 # Claude
 .claude/
+
+# Data Storage
+data/*.json
+!data/.gitkeepCoCoRaHS
