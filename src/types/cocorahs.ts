@@ -17,7 +17,7 @@ export interface CoCoRaHSObservation {
   /** Date of observation in ISO format (YYYY-MM-DD) */
   date: string;
 
-  /** Rainfall amount in inches */
+  /** Rainfall amount in inches (Gauge Catch) */
   rainfall: number;
 
   /** Snowfall amount in inches (optional) */
@@ -34,6 +34,40 @@ export interface CoCoRaHSObservation {
 
   /** When this record was last updated (ISO timestamp) */
   updatedAt: string;
+
+  // Extended fields from CoCoRaHS CSV export (all optional)
+  /** Time of observation (e.g., "7:00 AM") */
+  obsTime?: string;
+
+  /** Station number (e.g., "OR-CC-140") */
+  stationNumber?: string;
+
+  /** Station name (e.g., "Sandy 7.3 E") */
+  stationName?: string;
+
+  /** 24-hour snowfall - new snow depth in inches */
+  snowfallNewDepth?: number;
+
+  /** 24-hour snowfall - water content in inches */
+  snowfallWaterContent?: number;
+
+  /** 24-hour snowfall - snow-to-liquid ratio */
+  snowfallSLR?: number;
+
+  /** Total snowpack depth in inches */
+  snowpackTotalDepth?: number;
+
+  /** Snowpack water content in inches */
+  snowpackWaterContent?: number;
+
+  /** Snowpack density */
+  snowpackDensity?: number;
+
+  /** State (e.g., "OR") */
+  state?: string;
+
+  /** County (e.g., "Clackamas") */
+  county?: string;
 }
 
 /**
@@ -53,6 +87,17 @@ export interface CreateObservationRequest {
   rainfall: number;
   snowfall?: number;
   notes?: string;
+  // Extended fields from CSV import
+  obsTime?: string;
+  stationNumber?: string;
+  stationName?: string;
+  snowfallWaterContent?: number;
+  snowfallSLR?: number;
+  snowpackTotalDepth?: number;
+  snowpackWaterContent?: number;
+  snowpackDensity?: number;
+  state?: string;
+  county?: string;
 }
 
 /**

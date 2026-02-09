@@ -21,6 +21,10 @@ export default function CoCoRaHSPage() {
     notes: "",
   });
 
+  // CSV import state
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<string | null>(null);
+
   useEffect(() => {
     fetchObservations();
   }, []);
@@ -99,6 +103,50 @@ export default function CoCoRaHSPage() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete observation");
+    }
+  };
+
+  const handleCsvImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    setError(null);
+    setImportResult(null);
+
+    try {
+      const csvContent = await file.text();
+
+      const response = await fetch("/api/cocorahs/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ csvContent }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const { imported, skipped, errors, parseWarnings } = result.data;
+        let message = `✅ Import complete! ${imported} observations imported`;
+        if (skipped > 0) message += `, ${skipped} skipped (already exist)`;
+        if (errors && errors.length > 0) {
+          message += `\n\n⚠️ ${errors.length} errors:\n${errors.slice(0, 5).join("\n")}`;
+          if (errors.length > 5) message += `\n...and ${errors.length - 5} more`;
+        }
+        if (parseWarnings && parseWarnings.length > 0) {
+          message += `\n\nWarnings:\n${parseWarnings.slice(0, 3).join("\n")}`;
+        }
+        setImportResult(message);
+        fetchObservations();
+      } else {
+        setError(result.error || "Failed to import CSV");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to import CSV");
+    } finally {
+      setImporting(false);
+      // Reset file input
+      event.target.value = "";
     }
   };
 
@@ -205,8 +253,64 @@ export default function CoCoRaHSPage() {
             </form>
           </div>
 
+          {/* CSV Import Section */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 lg:col-span-2">
+            <h2 className="text-2xl font-semibold mb-4">Import from CSV</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Upload a CoCoRaHS CSV export to bulk import historical observations.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="csv-upload"
+                  className="flex items-center justify-center w-full px-4 py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                >
+                  <div className="text-center">
+                    <svg
+                      className="mx-auto h-12 w-12 text-gray-400"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <p className="mt-2 text-sm font-medium">
+                      {importing ? "Importing..." : "Click to upload CSV file"}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      CoCoRaHS CSV export format
+                    </p>
+                  </div>
+                  <input
+                    id="csv-upload"
+                    type="file"
+                    accept=".csv"
+                    onChange={handleCsvImport}
+                    disabled={importing}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {importResult && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <pre className="text-sm text-blue-900 dark:text-blue-100 whitespace-pre-wrap font-mono">
+                    {importResult}
+                  </pre>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Observations List */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 lg:col-span-2">
             <h2 className="text-2xl font-semibold mb-6">Recent Observations</h2>
 
             {observations.length === 0 ? (

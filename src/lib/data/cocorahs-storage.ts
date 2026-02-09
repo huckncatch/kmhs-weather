@@ -54,7 +54,7 @@ async function writeStorage(storage: CoCoRaHSStorage): Promise<void> {
  * Generate a unique ID for an observation
  */
 function generateId(): string {
-  return `obs-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `obs-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 }
 
 /**
@@ -120,6 +120,17 @@ export async function createObservation(
     source,
     createdAt: now,
     updatedAt: now,
+    // Extended fields (only if provided)
+    ...( data.obsTime && { obsTime: data.obsTime }),
+    ...(data.stationNumber && { stationNumber: data.stationNumber }),
+    ...(data.stationName && { stationName: data.stationName }),
+    ...(data.snowfallWaterContent !== undefined && { snowfallWaterContent: data.snowfallWaterContent }),
+    ...(data.snowfallSLR !== undefined && { snowfallSLR: data.snowfallSLR }),
+    ...(data.snowpackTotalDepth !== undefined && { snowpackTotalDepth: data.snowpackTotalDepth }),
+    ...(data.snowpackWaterContent !== undefined && { snowpackWaterContent: data.snowpackWaterContent }),
+    ...(data.snowpackDensity !== undefined && { snowpackDensity: data.snowpackDensity }),
+    ...(data.state && { state: data.state }),
+    ...(data.county && { county: data.county }),
   };
 
   storage.observations.push(observation);
@@ -198,6 +209,17 @@ export async function bulkImportObservations(
         source: "import",
         createdAt: now,
         updatedAt: now,
+        // Extended fields (only if provided)
+        ...(obs.obsTime && { obsTime: obs.obsTime }),
+        ...(obs.stationNumber && { stationNumber: obs.stationNumber }),
+        ...(obs.stationName && { stationName: obs.stationName }),
+        ...(obs.snowfallWaterContent !== undefined && { snowfallWaterContent: obs.snowfallWaterContent }),
+        ...(obs.snowfallSLR !== undefined && { snowfallSLR: obs.snowfallSLR }),
+        ...(obs.snowpackTotalDepth !== undefined && { snowpackTotalDepth: obs.snowpackTotalDepth }),
+        ...(obs.snowpackWaterContent !== undefined && { snowpackWaterContent: obs.snowpackWaterContent }),
+        ...(obs.snowpackDensity !== undefined && { snowpackDensity: obs.snowpackDensity }),
+        ...(obs.state && { state: obs.state }),
+        ...(obs.county && { county: obs.county }),
       };
 
       storage.observations.push(observation);
