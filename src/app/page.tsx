@@ -277,24 +277,6 @@ export default function Home() {
             </div>
           </div>
         )}
-
-        {/* Quick Links with enhanced button styling */}
-        <div className="mt-8 flex gap-4 flex-wrap">
-          <a
-            href="/cocorahs"
-            className="px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
-          >
-            <span>🌧️</span>
-            <span>Enter Rainfall Observation</span>
-          </a>
-          <a
-            href="/dashboard"
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
-          >
-            <span>📈</span>
-            <span>Detailed View</span>
-          </a>
-        </div>
       </div>
     </div>
   );
