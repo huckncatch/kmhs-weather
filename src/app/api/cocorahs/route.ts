@@ -12,7 +12,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   getAllObservations,
-  getObservationById,
   createObservation,
   updateObservation,
   deleteObservation,

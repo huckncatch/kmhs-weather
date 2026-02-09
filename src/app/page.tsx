@@ -51,7 +51,8 @@ export default function Home() {
       const todaysCoCoRaHS = cocorahsResult.data?.find((obs) => obs.date === today);
 
       // Aggregate current weather
-      const location = (device.info as any).coords?.location;
+      const deviceInfo = device.info as { name: string; coords?: { location?: string } };
+      const location = deviceInfo.coords?.location;
       const unified = aggregateCurrentWeather(latestData, todaysCoCoRaHS, {
         name: device.info.name,
         location,
@@ -99,114 +100,153 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">
+        {/* Header with enhanced styling */}
+        <div className="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border-l-4 border-blue-600">
+          <h1 className="text-5xl font-bold mb-3 text-gray-900 dark:text-white">
             {weatherData.stationName || "Weather Dashboard"}
           </h1>
           {weatherData.location && (
-            <p className="text-gray-600 dark:text-gray-400">{weatherData.location}</p>
+            <p className="text-lg text-gray-600 dark:text-gray-300 flex items-center gap-2">
+              📍 {weatherData.location}
+            </p>
           )}
-          <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             Last updated: {new Date(weatherData.lastUpdate).toLocaleString()}
           </p>
         </div>
 
-        {/* Main Weather Grid */}
+        {/* Main Weather Grid with improved styling */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {/* Temperature */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-              Temperature
+          {/* Temperature - Larger, more prominent */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+            <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">
+              🌡️ Temperature
             </h2>
-            <div className="text-5xl font-bold mb-2">{weatherData.temperature.current}°F</div>
+            <div className="text-7xl font-bold mb-3 text-blue-600 dark:text-blue-400">
+              {weatherData.temperature.current}°
+            </div>
             {weatherData.temperature.feelsLike && (
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Feels like {weatherData.temperature.feelsLike}°F
+              <p className="text-base text-gray-700 dark:text-gray-300">
+                Feels like <span className="font-semibold">{weatherData.temperature.feelsLike}°F</span>
               </p>
             )}
             {weatherData.temperature.indoor && (
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                 Indoor: {weatherData.temperature.indoor}°F
               </p>
             )}
           </div>
 
-          {/* Humidity */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Humidity</h2>
-            <div className="text-5xl font-bold mb-2">
+          {/* Humidity with visual enhancement */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+            <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">
+              💧 Humidity
+            </h2>
+            <div className="text-7xl font-bold mb-3 text-cyan-600 dark:text-cyan-400">
               {weatherData.humidity.outdoor ?? "--"}%
             </div>
             {weatherData.humidity.indoor && (
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                 Indoor: {weatherData.humidity.indoor}%
               </p>
             )}
           </div>
 
-          {/* Wind */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Wind</h2>
-            <div className="text-5xl font-bold mb-2">{weatherData.wind.speed} mph</div>
+          {/* Wind with circular direction indicator */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+            <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">
+              💨 Wind
+            </h2>
+            <div className="flex items-center gap-4 mb-3">
+              <div className="text-6xl font-bold text-green-600 dark:text-green-400">
+                {weatherData.wind.speed}
+              </div>
+              <div className="text-2xl text-gray-600 dark:text-gray-400">mph</div>
+            </div>
             {weatherData.wind.direction !== undefined && (
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Direction: {weatherData.wind.direction}°
-              </p>
+              <div className="flex items-center gap-3 mb-2">
+                <div
+                  className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center"
+                  style={{ transform: `rotate(${weatherData.wind.direction}deg)` }}
+                >
+                  <span className="text-xl">↑</span>
+                </div>
+                <p className="text-base text-gray-700 dark:text-gray-300">
+                  {weatherData.wind.direction}°
+                </p>
+              </div>
             )}
             {weatherData.wind.gust && weatherData.wind.gust > 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                Gusts: {weatherData.wind.gust} mph
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                Gusts: <span className="font-semibold">{weatherData.wind.gust} mph</span>
               </p>
             )}
           </div>
 
-          {/* Rainfall - PRIORITY DISPLAY */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 md:col-span-2 lg:col-span-1">
-            <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4">
-              Rainfall Today
+          {/* Rainfall - PRIORITY DISPLAY with enhanced styling */}
+          <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl shadow-lg p-8 border-2 border-green-300 dark:border-green-700 md:col-span-2 lg:col-span-1 hover:shadow-xl transition-shadow duration-300">
+            <h2 className="text-sm font-semibold text-green-800 dark:text-green-300 uppercase tracking-wide mb-4">
+              🌧️ Rainfall Today
             </h2>
             <RainfallDisplay data={weatherData.rainfall} showComparison={true} />
           </div>
 
           {/* Pressure */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-              Barometric Pressure
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+            <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">
+              🔽 Barometric Pressure
             </h2>
-            <div className="text-4xl font-bold mb-2">
-              {weatherData.pressure.relative?.toFixed(2) ?? "--"} inHg
+            <div className="text-5xl font-bold mb-2 text-purple-600 dark:text-purple-400">
+              {weatherData.pressure.relative?.toFixed(2) ?? "--"}
             </div>
+            <div className="text-base text-gray-600 dark:text-gray-400">inHg</div>
           </div>
 
-          {/* UV Index */}
+          {/* UV Index with color coding */}
           {weatherData.uv !== undefined && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-              <h2 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                UV Index
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300">
+              <h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-3">
+                ☀️ UV Index
               </h2>
-              <div className="text-5xl font-bold mb-2">{weatherData.uv}</div>
+              <div
+                className={`text-7xl font-bold mb-2 ${
+                  weatherData.uv <= 2 ? "text-green-600 dark:text-green-400" :
+                  weatherData.uv <= 5 ? "text-yellow-600 dark:text-yellow-400" :
+                  weatherData.uv <= 7 ? "text-orange-600 dark:text-orange-400" :
+                  "text-red-600 dark:text-red-400"
+                }`}
+              >
+                {weatherData.uv}
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {weatherData.uv <= 2 ? "Low" :
+                 weatherData.uv <= 5 ? "Moderate" :
+                 weatherData.uv <= 7 ? "High" :
+                 "Very High"}
+              </p>
             </div>
           )}
         </div>
 
-        {/* Rainfall History */}
+        {/* Rainfall History with enhanced styling */}
         {rainfallHistory.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-6">Recent Rainfall (Last 7 Days)</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white flex items-center gap-3">
+              📊 Recent Rainfall <span className="text-lg font-normal text-gray-500">(Last 7 Days)</span>
+            </h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-700">
-                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                  <tr className="border-b-2 border-gray-300 dark:border-gray-600">
+                    <th className="text-left py-4 px-4 font-semibold text-gray-700 dark:text-gray-300 uppercase text-sm">
                       Date
                     </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                    <th className="text-left py-4 px-4 font-semibold text-gray-700 dark:text-gray-300 uppercase text-sm">
                       Rainfall
                     </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">
+                    <th className="text-left py-4 px-4 font-semibold text-gray-700 dark:text-gray-300 uppercase text-sm">
                       Source
                     </th>
                   </tr>
@@ -215,17 +255,19 @@ export default function Home() {
                   {rainfallHistory.map((day) => (
                     <tr
                       key={day.date}
-                      className="border-b border-gray-100 dark:border-gray-700 last:border-0"
+                      className="border-b border-gray-100 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-200"
                     >
-                      <td className="py-3 px-4">
+                      <td className="py-4 px-4 text-gray-900 dark:text-gray-100">
                         {new Date(day.date).toLocaleDateString("en-US", {
                           weekday: "short",
                           month: "short",
                           day: "numeric",
                         })}
                       </td>
-                      <td className="py-3 px-4 font-semibold">{day.amount.toFixed(2)}"</td>
-                      <td className="py-3 px-4">
+                      <td className="py-4 px-4 text-xl font-bold text-blue-600 dark:text-blue-400">
+                        {day.amount.toFixed(2)}&quot;
+                      </td>
+                      <td className="py-4 px-4">
                         <RainfallBadge data={day} />
                       </td>
                     </tr>
@@ -236,19 +278,21 @@ export default function Home() {
           </div>
         )}
 
-        {/* Quick Links */}
+        {/* Quick Links with enhanced button styling */}
         <div className="mt-8 flex gap-4 flex-wrap">
           <a
             href="/cocorahs"
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+            className="px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
           >
-            Enter Rainfall Observation
+            <span>🌧️</span>
+            <span>Enter Rainfall Observation</span>
           </a>
           <a
             href="/dashboard"
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
           >
-            Detailed View
+            <span>📈</span>
+            <span>Detailed View</span>
           </a>
         </div>
       </div>

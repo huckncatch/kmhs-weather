@@ -233,11 +233,11 @@ export default function CoCoRaHSPage() {
                         </p>
                         <div className="mt-2 space-y-1">
                           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                            {obs.rainfall}" rain
+                            {obs.rainfall}&quot; rain
                           </p>
                           {obs.snowfall !== undefined && obs.snowfall > 0 && (
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              {obs.snowfall}" snow
+                              {obs.snowfall}&quot; snow
                             </p>
                           )}
                         </div>
