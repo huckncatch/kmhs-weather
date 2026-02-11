@@ -21,6 +21,9 @@ export default function CoCoRaHSPage() {
     notes: "",
   });
 
+  // Edit mode state
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   // CSV import state
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<string | null>(null);
@@ -49,38 +52,97 @@ export default function CoCoRaHSPage() {
     setSuccess(null);
 
     try {
-      const requestData: CreateObservationRequest = {
-        date: formData.date,
-        rainfall: parseFloat(formData.rainfall),
-        ...(formData.snowfall && { snowfall: parseFloat(formData.snowfall) }),
-        ...(formData.notes && { notes: formData.notes }),
-      };
+      if (editingId) {
+        // Update existing observation
+        const updateData = {
+          rainfall: parseFloat(formData.rainfall),
+          ...(formData.snowfall && { snowfall: parseFloat(formData.snowfall) }),
+          ...(formData.notes && { notes: formData.notes }),
+        };
 
-      const response = await fetch("/api/cocorahs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
-      });
-
-      const result: CoCoRaHSApiResponse<CoCoRaHSObservation> = await response.json();
-
-      if (result.success) {
-        setSuccess("Observation saved successfully!");
-        setFormData({
-          date: new Date().toISOString().split("T")[0],
-          rainfall: "",
-          snowfall: "",
-          notes: "",
+        const response = await fetch(`/api/cocorahs?id=${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updateData),
         });
-        fetchObservations();
+
+        const result: CoCoRaHSApiResponse<CoCoRaHSObservation> = await response.json();
+
+        if (result.success) {
+          setSuccess("Observation updated successfully!");
+          setEditingId(null);
+          setFormData({
+            date: new Date().toISOString().split("T")[0],
+            rainfall: "",
+            snowfall: "",
+            notes: "",
+          });
+          fetchObservations();
+        } else {
+          setError(result.error || "Failed to update observation");
+        }
       } else {
-        setError(result.error || "Failed to save observation");
+        // Create new observation
+        const requestData: CreateObservationRequest = {
+          date: formData.date,
+          rainfall: parseFloat(formData.rainfall),
+          ...(formData.snowfall && { snowfall: parseFloat(formData.snowfall) }),
+          ...(formData.notes && { notes: formData.notes }),
+        };
+
+        const response = await fetch("/api/cocorahs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestData),
+        });
+
+        const result: CoCoRaHSApiResponse<CoCoRaHSObservation> = await response.json();
+
+        if (result.success) {
+          setSuccess("Observation saved successfully!");
+          setFormData({
+            date: new Date().toISOString().split("T")[0],
+            rainfall: "",
+            snowfall: "",
+            notes: "",
+          });
+          fetchObservations();
+        } else {
+          setError(result.error || "Failed to save observation");
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save observation");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (obs: CoCoRaHSObservation) => {
+    setEditingId(obs.id);
+    setFormData({
+      date: obs.date,
+      rainfall: obs.rainfall.toString(),
+      snowfall: obs.snowfall?.toString() || "",
+      notes: obs.notes || "",
+    });
+    // Clear any previous messages
+    setError(null);
+    setSuccess(null);
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormData({
+      date: new Date().toISOString().split("T")[0],
+      rainfall: "",
+      snowfall: "",
+      notes: "",
+    });
+    setError(null);
+    setSuccess(null);
   };
 
   const handleDelete = async (id: string) => {
@@ -97,6 +159,10 @@ export default function CoCoRaHSPage() {
 
       if (result.success) {
         setSuccess("Observation deleted successfully!");
+        // If we were editing this observation, cancel edit mode
+        if (editingId === id) {
+          handleCancelEdit();
+        }
         fetchObservations();
       } else {
         setError(result.error || "Failed to delete observation");
@@ -175,7 +241,20 @@ export default function CoCoRaHSPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Entry Form */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-6">New Observation</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold">
+                {editingId ? "Edit Observation" : "New Observation"}
+              </h2>
+              {editingId && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  ✕ Cancel
+                </button>
+              )}
+            </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Date */}
               <div>
@@ -188,8 +267,14 @@ export default function CoCoRaHSPage() {
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500"
+                  disabled={!!editingId}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:dark:bg-gray-800 disabled:cursor-not-allowed"
                 />
+                {editingId && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Date cannot be changed when editing
+                  </p>
+                )}
               </div>
 
               {/* Rainfall */}
@@ -243,13 +328,30 @@ export default function CoCoRaHSPage() {
               </div>
 
               {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
-                {loading ? "Saving..." : "Save Observation"}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                >
+                  {loading
+                    ? editingId
+                      ? "Updating..."
+                      : "Saving..."
+                    : editingId
+                      ? "Update Observation"
+                      : "Save Observation"}
+                </button>
+                {editingId && (
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
             </form>
           </div>
 
@@ -323,7 +425,11 @@ export default function CoCoRaHSPage() {
                 {observations.map((obs) => (
                   <div
                     key={obs.id}
-                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    className={`border rounded-lg p-4 transition-colors ${
+                      editingId === obs.id
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                        : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    }`}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1">
@@ -351,12 +457,20 @@ export default function CoCoRaHSPage() {
                           </p>
                         )}
                       </div>
-                      <button
-                        onClick={() => handleDelete(obs.id)}
-                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(obs)}
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(obs.id)}
+                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                       <span className="text-xs px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded">
