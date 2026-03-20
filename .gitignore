@@ -49,6 +49,9 @@ Thumbs.db
 # Claude
 .claude/
 
+# Superpowers brainstorm sessions
+.superpowers/
+
 # Data Storage
 data/*.json
 !data/.gitkeepCoCoRaHS
