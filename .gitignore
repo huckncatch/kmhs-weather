@@ -54,4 +54,5 @@ Thumbs.db
 
 # Data Storage
 data/*.json
+data/*.db
 !data/.gitkeepCoCoRaHS
