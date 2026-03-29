@@ -86,6 +86,8 @@ export interface CreateObservationRequest {
   date: string;
   rainfall: number;
   snowfall?: number;
+  /** 24-hour new snow depth in inches */
+  snowfallNewDepth?: number;
   notes?: string;
   // Extended fields from CSV import
   obsTime?: string;
