@@ -31,13 +31,25 @@ export async function fetchAndSaveAmbientHistory(
     }
     firstBatch = false
 
-    const batch = await getDeviceData({
-      apiKey: credentials.apiKey,
-      applicationKey: credentials.applicationKey,
-      macAddress: credentials.macAddress,
-      endDate,
-      limit: BATCH_SIZE,
-    })
+    let batch: Awaited<ReturnType<typeof getDeviceData>>
+    try {
+      batch = await getDeviceData({
+        apiKey: credentials.apiKey,
+        applicationKey: credentials.applicationKey,
+        macAddress: credentials.macAddress,
+        endDate,
+        limit: BATCH_SIZE,
+      })
+    } catch (err) {
+      const batchEnd = new Date(endDate).toISOString().split('T')[0]
+      const batchStart = new Date(endDate - BATCH_SIZE * 5 * 60 * 1000).toISOString().split('T')[0]
+      console.error(`[ambient-history-fetcher] Batch failed (${batchStart}–${batchEnd}):`, err)
+      // Advance cursor past this batch window and continue
+      endDate = endDate - BATCH_SIZE * 5 * 60 * 1000 - 1
+      if (endDate < fromMs) break
+      await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAY_MS))
+      continue
+    }
 
     if (batch.length === 0) break
 
