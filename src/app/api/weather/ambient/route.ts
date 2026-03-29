@@ -11,6 +11,8 @@ import {
   getLatestDeviceData,
   validateApiCredentials,
 } from "@/lib/api/ambient";
+import { saveReading, getLatestTimestamp } from '@/lib/data/ambient-storage'
+import { fetchAndSaveAmbientHistory } from '@/lib/data/ambient-history-fetcher'
 
 /**
  * GET /api/weather/ambient
@@ -20,6 +22,8 @@ import {
  * - limit: optional, max 288 (for "data" action)
  * - endDate: optional, milliseconds since epoch or date string (for "data" action)
  */
+let gapFillAttempted = false
+
 export async function GET(request: NextRequest) {
   try {
     // Validate API credentials are configured
@@ -78,6 +82,30 @@ export async function GET(request: NextRequest) {
             { success: false, error: "No data available for this device" },
             { status: 404 }
           );
+        }
+
+        // Auto-save this reading to the database
+        try {
+          saveReading(latestData)
+        } catch (err) {
+          console.error('[ambient-storage] saveReading failed:', err)
+        }
+
+        // On first request after cold start, fill any gap since last saved reading
+        if (!gapFillAttempted) {
+          gapFillAttempted = true
+          const latestSaved = getLatestTimestamp()
+          if (latestSaved) {
+            const latestSavedMs = new Date(latestSaved).getTime()
+            const gapMinutes = (Date.now() - latestSavedMs) / 60000
+            if (gapMinutes > 5) {
+              // Fire-and-forget: don't await, don't block the response
+              fetchAndSaveAmbientHistory(latestSavedMs, Date.now(), {
+                ...credentials,
+                macAddress,
+              }).catch((err) => console.error('[gap-fill] failed:', err))
+            }
+          }
         }
 
         return NextResponse.json({ success: true, data: latestData });
