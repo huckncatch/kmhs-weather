@@ -67,6 +67,14 @@ export async function scrapeCoCoRaHSObservations(options: {
       }),
     )
 
+    // Guard against selector mismatch: distinguish "no observations" from "table not found"
+    if (rows.length === 0) {
+      const tableExists = (await page.$('table.observations-table')) !== null
+      if (!tableExists) {
+        throw new Error('Observations table not found — selector may need updating after smoke test')
+      }
+    }
+
     return parseTableRows(rows)
   } finally {
     await browser.close()
@@ -92,9 +100,9 @@ function parseTableRows(rows: string[][]): CreateObservationRequest[] {
     if (!dateMatch) continue
     const date = `${dateMatch[3]}-${dateMatch[1].padStart(2, '0')}-${dateMatch[2].padStart(2, '0')}`
 
-    // Parse rainfall (handle trace amounts)
+    // Parse rainfall (handle trace amounts — case-insensitive for robustness)
     let rainfall: number
-    if (rainfallStr === 'T') {
+    if (rainfallStr.toUpperCase() === 'T') {
       rainfall = 0.01
     } else {
       rainfall = parseFloat(rainfallStr)
