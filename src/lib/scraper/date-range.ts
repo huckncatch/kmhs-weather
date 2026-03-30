@@ -34,7 +34,7 @@ export function resolveDateRange(
 
     case 'range': {
       if (!req.startDate || !req.endDate) {
-        throw new Error('startDate and endDate required for range mode')
+        throw new Error('startDate and endDate required')
       }
       return { startDate: req.startDate, endDate: req.endDate }
     }
