@@ -6,6 +6,7 @@ import type {
   CoCoRaHSApiResponse,
   CreateObservationRequest,
 } from "@/types/cocorahs";
+import { CoCoRaHSSyncPanel } from "@/components/weather/CoCoRaHSSyncPanel";
 
 export default function CoCoRaHSPage() {
   const [observations, setObservations] = useState<CoCoRaHSObservation[]>([]);
@@ -409,6 +410,11 @@ export default function CoCoRaHSPage() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Sync from CoCoRaHS */}
+          <div className="lg:col-span-2">
+            <CoCoRaHSSyncPanel onSyncComplete={fetchObservations} />
           </div>
 
           {/* Observations List */}
