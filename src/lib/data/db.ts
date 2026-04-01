@@ -59,4 +59,15 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_ambient_readings_date ON ambient_readings(date);
 `)
 
+// Migrations: add columns introduced after initial schema creation.
+// SQLite does not support IF NOT EXISTS on ALTER TABLE ADD COLUMN, so we
+// catch the error that fires when the column already exists.
+try {
+  db.exec(
+    `ALTER TABLE cocorahs_observations ADD COLUMN is_trace INTEGER NOT NULL DEFAULT 0`,
+  )
+} catch {
+  // Column already exists — safe to ignore
+}
+
 export default db

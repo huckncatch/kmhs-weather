@@ -23,6 +23,7 @@ function rowToObservation(row: RawRow): CoCoRaHSObservation {
     id: row.id as string,
     date: row.date as string,
     rainfall: row.rainfall as number,
+    ...(row.is_trace ? { isTrace: true } : {}),
     ...(row.snowfall !== null && { snowfall: row.snowfall as number }),
     ...(row.snowfall_new_depth !== null && { snowfallNewDepth: row.snowfall_new_depth as number }),
     ...(row.snowfall_water_content !== null && { snowfallWaterContent: row.snowfall_water_content as number }),
@@ -94,15 +95,15 @@ export async function createObservation(
 
   db.prepare(`
     INSERT INTO cocorahs_observations (
-      id, date, rainfall, snowfall, snowfall_new_depth, snowfall_water_content,
+      id, date, rainfall, is_trace, snowfall, snowfall_new_depth, snowfall_water_content,
       snowfall_slr, snowpack_total_depth, snowpack_water_content, snowpack_density,
       obs_time, station_number, station_name, state, county, notes, source,
       created_at, updated_at
     ) VALUES (
-      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     )
   `).run(
-    id, data.date, data.rainfall,
+    id, data.date, data.rainfall, data.isTrace ? 1 : 0,
     data.snowfall ?? null,
     data.snowfallNewDepth ?? null,
     data.snowfallWaterContent ?? null,
@@ -162,12 +163,12 @@ export async function bulkImportObservations(
 
   const insertStmt = db.prepare(`
     INSERT OR IGNORE INTO cocorahs_observations (
-      id, date, rainfall, snowfall, snowfall_new_depth, snowfall_water_content,
+      id, date, rainfall, is_trace, snowfall, snowfall_new_depth, snowfall_water_content,
       snowfall_slr, snowpack_total_depth, snowpack_water_content, snowpack_density,
       obs_time, station_number, station_name, state, county, notes, source,
       created_at, updated_at
     ) VALUES (
-      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     )
   `)
 
@@ -175,7 +176,7 @@ export async function bulkImportObservations(
     try {
       const now = new Date().toISOString()
       const result = insertStmt.run(
-        generateId(), obs.date, obs.rainfall,
+        generateId(), obs.date, obs.rainfall, obs.isTrace ? 1 : 0,
         obs.snowfall ?? null,
         obs.snowfallNewDepth ?? null,
         obs.snowfallWaterContent ?? null,

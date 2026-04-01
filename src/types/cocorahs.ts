@@ -17,8 +17,11 @@ export interface CoCoRaHSObservation {
   /** Date of observation in ISO format (YYYY-MM-DD) */
   date: string;
 
-  /** Rainfall amount in inches (Gauge Catch) */
+  /** Rainfall amount in inches (Gauge Catch); 0.01 when isTrace is true */
   rainfall: number;
+
+  /** True when the original CoCoRaHS observation was "T" (trace), not a measured value */
+  isTrace?: boolean;
 
   /** Snowfall amount in inches (optional) */
   snowfall?: number;
@@ -85,6 +88,7 @@ export interface CoCoRaHSStorage {
 export interface CreateObservationRequest {
   date: string;
   rainfall: number;
+  isTrace?: boolean;
   snowfall?: number;
   /** 24-hour new snow depth in inches */
   snowfallNewDepth?: number;
