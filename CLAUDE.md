@@ -614,3 +614,7 @@ As the project evolves, update the "Current Status" section in Project Overview 
 - Don't over-engineer - start simple and add complexity as needed
 - Document decisions and learnings in this file or project documentation
 - Update this CLAUDE.md as patterns emerge and requirements change
+
+## Cross-repo documentation
+
+This app's LaunchAgent/tmux auto-start setup is also documented in `~/config/NOTES.md` under "kmhs-weather Dev Server" (fresh-install/restore steps, verify/restart commands, log paths). If a change here affects `bin/start.sh`, the LaunchAgent plist (`launchagents/com.local.kmhs-weather.plist`), the tmux session name (`kmhs-weather`), the dev server port (3000), or log file locations (`/tmp/kmhs-weather-launch.log`), update that section of `~/config/NOTES.md` too — it's the canonical "how to restore this on a fresh machine" reference and lives outside this repo.
