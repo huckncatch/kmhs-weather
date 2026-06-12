@@ -588,17 +588,6 @@ Draw design inspiration from:
 
 Document specific UI elements you want to replicate as you develop the application.
 
-### Future Enhancements
-
-Ideas to consider for future development:
-
-- Historical data visualization and trends
-- Weather alerts and notifications
-- Mobile-responsive design
-- Data export functionality
-- Comparison views (CoCoRaHS vs station rainfall)
-- Weather statistics (monthly/yearly summaries)
-
 ### Project Status Updates
 
 As the project evolves, update the "Current Status" section in Project Overview to reflect:
