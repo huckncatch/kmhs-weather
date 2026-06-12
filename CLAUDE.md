@@ -604,6 +604,15 @@ As the project evolves, update the "Current Status" section in Project Overview 
 - Document decisions and learnings in this file or project documentation
 - Update this CLAUDE.md as patterns emerge and requirements change
 
+## Feature Development Workflow (EPCT)
+
+For TODO items, use `/epct` (global checkpoint/test-plan process defined in
+`~/.config/claude/commands/epct.md`). Preview info for its Phase 1:
+
+- Dev server: `pnpm dev` (tmux session `kmhs-weather`), hot-reloads at
+  http://localhost:3000 — no restart needed for UX checkpoints.
+- Tests: `npm test`
+
 ## Cross-repo documentation
 
-This app's LaunchAgent/tmux auto-start setup is also documented in `~/config/NOTES.md` under "kmhs-weather Dev Server" (fresh-install/restore steps, verify/restart commands, log paths). If a change here affects `bin/start.sh`, the LaunchAgent plist (`launchagents/com.local.kmhs-weather.plist`), the tmux session name (`kmhs-weather`), the dev server port (3000), or log file locations (`/tmp/kmhs-weather-launch.log`), update that section of `~/config/NOTES.md` too — it's the canonical "how to restore this on a fresh machine" reference and lives outside this repo.
+This app's LaunchAgent/tmux auto-start setup is also documented in `~/config/NOTES.md` under "kmhs-weather Dev Server" (fresh-install/restore steps, verify/restart commands, log paths). If a change here affects `bin/install.sh`, `bin/start.sh`, the LaunchAgent plist (`launchagents/com.local.kmhs-weather.plist`), the tmux session name (`kmhs-weather`), the dev server port (3000), or log file locations (`/tmp/kmhs-weather-launch.log`), update that section of `~/config/NOTES.md` too — it's the canonical "how to restore this on a fresh machine" reference and lives outside this repo.

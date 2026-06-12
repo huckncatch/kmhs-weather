@@ -8,7 +8,7 @@
 - Data export functionality
 - Comparison views (CoCoRaHS vs station rainfall)
 - Weather statistics (monthly/yearly summaries)
-- Add `bin/install.sh` (like worldpackers-hours-tracker) — self-contained fresh-install script that copies `launchagents/com.local.kmhs-weather.plist` to `~/Library/LaunchAgents/`, runs `launchctl load`, and starts the server (the LaunchAgent plist and `bin/start.sh` already exist from commit 9119f21)
+- Test `bin/install.sh` end-to-end (see test plan from EPCT session 2026-06-12) and confirm before marking done
 
 ## Completed
 
