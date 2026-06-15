@@ -613,6 +613,17 @@ For TODO items, use `/epct` (global checkpoint/test-plan process defined in
   http://localhost:3000 — no restart needed for UX checkpoints.
 - Tests: `npm test`
 
-## Cross-repo documentation
+## Cross-repo documentation (Config)
 
 This app's LaunchAgent/tmux auto-start setup is also documented in `~/config/NOTES.md` under "kmhs-weather Dev Server" (fresh-install/restore steps, verify/restart commands, log paths). If a change here affects `bin/install.sh`, `bin/start.sh`, the LaunchAgent plist (`launchagents/com.local.kmhs-weather.plist`), the tmux session name (`kmhs-weather`), the dev server port (3000), or log file locations (`/tmp/kmhs-weather-launch.log`), update that section of `~/config/NOTES.md` too — it's the canonical "how to restore this on a fresh machine" reference and lives outside this repo.
+
+## Cross-repo documentation (Obsidian)
+
+This project's status is tracked at `Home/Development/Projects/KMHS Weather Server.md` in the
+Obsidian vault (`/Users/soob/Dropbox/Apps/Obsidian`), via the `obsidian-cortex`
+MCP server. Update that note when the tech stack, data sources, or project
+status change.
+
+Design decisions, research, and plans worth cross-project visibility go in
+`Home/90_Organize/Claude/{decisions,research,plans}/` — see that directory's
+README.md for naming conventions and fileClasses.
