@@ -8,4 +8,4 @@ PNPM=/opt/homebrew/bin/pnpm
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 
 $TMUX has-session -t kmhs-weather 2>/dev/null || \
-  $TMUX new-session -d -s kmhs-weather "$PNPM --dir /Users/soob/Developer/kmhs-weather dev"
+  $TMUX new-session -d -s kmhs-weather "$PNPM --dir /Users/soob/Developer/kmhs-weather dev:lan"
