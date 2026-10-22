@@ -619,11 +619,10 @@ This app's LaunchAgent/tmux auto-start setup is also documented in `~/config/NOT
 
 ## Cross-repo documentation (Obsidian)
 
-This project's status is tracked at `Home/Development/Projects/KMHS Weather Server.md` in the
-Obsidian vault (`/Users/soob/Dropbox/Apps/Obsidian`), via the `obsidian-cortex`
-MCP server. Update that note when the tech stack, data sources, or project
-status change.
+This project's note in the Home Obsidian vault is
+`Development/Projects/KMHS Weather Server.md`
+(vault location and rules: `~/config/brain/`). Update it when
+the tech stack, data sources, or project status change.
 
-Design decisions, research, and plans worth cross-project visibility go in
-`Home/90_Organize/Claude/{decisions,research,plans}/` — see that directory's
-README.md for naming conventions and fileClasses.
+Decisions, research, and plans worth cross-project visibility go to the vault
+through the `vault` skill (log flow).
