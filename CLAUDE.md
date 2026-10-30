@@ -606,8 +606,9 @@ As the project evolves, update the "Current Status" section in Project Overview 
 
 ## Feature Development Workflow (EPCT)
 
-For TODO items, use `/epct` (global checkpoint/test-plan process defined in
-`~/.config/claude/commands/epct.md`). Preview info for its Phase 1:
+For to-dos (this repo's Things project), use `/epct` (global
+checkpoint/test-plan process defined in `~/.config/claude/commands/epct.md`).
+Preview info for its Phase 1:
 
 - Dev server: `pnpm dev` (tmux session `kmhs-weather`), hot-reloads at
   http://localhost:3000 — no restart needed for UX checkpoints.
