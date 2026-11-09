@@ -419,7 +419,7 @@ interface CoCoRaHSObservation {
 **Commit Practices:**
 
 - Follow global CLAUDE.md guidelines for commits
-- Present commit messages for approval before committing
+- Commit and push when the task is done, without asking
 - Commit frequently with focused, atomic changes
 - Never commit API keys or sensitive data
 
